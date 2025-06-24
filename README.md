@@ -2,7 +2,6 @@
 
 A responsive browser-based Tic Tac Toe game with Player vs Player and logic-driven bot opponents — from random moves to impossible-to-beat Minimax logic.
 
-![screenshot](preview.png)
 
 ---
 
