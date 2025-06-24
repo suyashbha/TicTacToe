@@ -33,22 +33,11 @@ body {
   gap: 1rem;
 }
 
-.nav-right select,
-#reset-btn {
+.nav-right select {
   padding: 0.4rem 0.7rem;
   font-size: 0.9rem;
   border-radius: 5px;
   border: none;
-}
-
-#reset-btn {
-  background-color: #3f72af;
-  color: white;
-  cursor: pointer;
-}
-
-#reset-btn:hover {
-  background-color: #2e5c93;
 }
 
 .github-link img {
@@ -192,30 +181,41 @@ footer {
 
 @media (max-width: 600px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    padding: 0.5rem;
     gap: 0.5rem;
+  }
+  .navbar > * {
+    margin: 0.3rem 0;
+  }
+  .nav-left {
+    width: 100%;
+    padding-left: 10px;
   }
 
   .nav-right {
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: end;
+    align-items: center;
     width: 100%;
   }
 
   .nav-right select,
-  #reset-btn,
   .github-link {
     width: 100%;
   }
 
   .nav-right select {
-    max-width: 200px;
+    max-width: 150px;
   }
-
-  .github-link {
-    display: inline-block;
-    margin-top: 0.5rem;
+  .nav-right a {
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .nav-right img {
+    width: 28px;
+    height: 28px;
   }
   .btn {
     font-size: 2rem;
