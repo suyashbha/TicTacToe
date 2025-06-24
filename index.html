@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>TicTacToe</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css" />
+  <title>TicTacToe</title>
 </head>
 <body>
-        <div class="win hide">
-            <h1 class="msg"></h1><br>
-            <button class="new">New Game</button>
-        </div>
-        <div class="container">
-            <h1>Tic-Tac-Toe</h1><br>
-            <div class="buttons">
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>    
-            </div>
-        </div>
+  <header>
+    <h1>Welcome to Tic Tac Toe 🎮</h1>
+    <p class="subtitle">Choose a mode and play!</p>
+  </header>
 
-        <button class="reset">Reset</button>
-    <script src="app.js"></script>
+  <div class="card">
+    <div class="mode-select">
+      <label for="mode">Mode:</label>
+      <select id="mode">
+        <option value="pvp">Player vs Player</option>
+        <option value="easy">Player vs AI (Easy)</option>
+        <option value="medium">Player vs AI (Medium)</option>
+        <option value="hard">Player vs AI (Hard)</option>
+      </select>
+    </div>
+
+    <div class="status" id="turn-indicator">X's Turn</div>
+
+    <div class="buttons">
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+      <button class="btn"></button>
+    </div>
+
+    <button class="reset">Reset</button>
+  </div>
+
+  <div class="win hide">
+    <h1 class="msg"></h1>
+    <button class="new">New Game</button>
+  </div>
+
+  <footer>
+    Made with ❤️ by Suyash Bhardwaj
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
