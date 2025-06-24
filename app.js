@@ -1,32 +1,50 @@
-let resetbtn = document.querySelector(".reset");
-let boxes = document.querySelectorAll(".btn");
-let message = document.querySelector(".msg");
-let container = document.querySelector(".win");
-let newGame = document.querySelector(".new");
-let turnDisplay = document.getElementById("turn-indicator");
-let modeSelect = document.getElementById("mode");
+const boxes = document.querySelectorAll(".btn");
+const resetBoardBtn = document.getElementById("reset-btn");
+const resetScoresBtn = document.getElementById("reset-scores");
+const turnDisplay = document.getElementById("turn-indicator");
+const modeSelect = document.getElementById("mode");
+const msgBox = document.querySelector(".msg");
+const winContainer = document.querySelector(".win");
+const newGameBtn = document.querySelector(".new");
+
+const scoreX = document.getElementById("score-x");
+const scoreO = document.getElementById("score-o");
+const scoreDraw = document.getElementById("score-draw");
+
+const delay = currentAIType() === "hard" ? 50 : 300;
 
 const winPattern = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
 ];
 
 let turnX = true;
 let moveCount = 0;
-let isGameOver = false;
+let gameOver = false;
+let score = { X: 0, O: 0, draw: 0 };
+
+function updateScoreboard() {
+  scoreX.textContent = `X: ${score.X}`;
+  scoreO.textContent = `O: ${score.O}`;
+  scoreDraw.textContent = `Draws: ${score.draw}`;
+}
 
 function resetBoard() {
-  boxes.forEach((box) => {
-    box.disabled = false;
-    box.innerText = "";
-    box.style.color = "#3f72af";
+  boxes.forEach((b) => {
+    b.innerText = "";
+    b.disabled = false;
+    b.classList.remove("winning-box");
   });
   turnX = true;
   moveCount = 0;
-  isGameOver = false;
-  container.classList.add("hide");
-  resetbtn.classList.remove("hide");
+  gameOver = false;
+  winContainer.classList.add("hide");
   turnDisplay.innerText = "X's Turn";
   turnDisplay.style.color = "#3f72af";
 
@@ -42,21 +60,22 @@ function currentAIType() {
 }
 
 function getAvailableMoves() {
-  return [...boxes].map((b, i) => b.innerText === "" ? i : null).filter(i => i !== null);
+  return [...boxes]
+    .map((b, i) => (b.innerText === "" ? i : null))
+    .filter((i) => i !== null);
 }
 
 function makeAIMove() {
-  if (isGameOver) return;
-
-  let index;
+  if (gameOver) return;
   const available = getAvailableMoves();
+  let index;
 
   switch (currentAIType()) {
     case "easy":
       index = available[Math.floor(Math.random() * available.length)];
       break;
     case "medium":
-      index = getMediumAIMove();
+      index = getMediumMove();
       break;
     case "hard":
       index = getBestMove("O");
@@ -64,76 +83,69 @@ function makeAIMove() {
   }
 
   setTimeout(() => {
-    if (index !== undefined) {
-      boxes[index].innerText = "O";
-      boxes[index].style.color = "#d80032";
-      boxes[index].disabled = true;
-      moveCount++;
-      turnX = true;
-      turnDisplay.innerText = "X's Turn";
-      turnDisplay.style.color = "#3f72af";
-      checkWinner();
-    }
-  }, 400);
+    boxes[index].innerText = "O";
+    boxes[index].style.color = "#d80032";
+    boxes[index].disabled = true;
+    moveCount++;
+    turnX = true;
+    turnDisplay.innerText = "X's Turn";
+    checkWinner();
+  }, delay);
 }
 
-function getMediumAIMove() {
-  const available = getAvailableMoves();
-
-  // Try to win
-  for (let i of available) {
+function getMediumMove() {
+  for (let i of getAvailableMoves()) {
     boxes[i].innerText = "O";
-    if (checkSimulatedWin("O")) {
+    if (checkVirtualWin("O")) {
       boxes[i].innerText = "";
       return i;
     }
     boxes[i].innerText = "";
   }
-
-  // Try to block
-  for (let i of available) {
+  for (let i of getAvailableMoves()) {
     boxes[i].innerText = "X";
-    if (checkSimulatedWin("X")) {
+    if (checkVirtualWin("X")) {
       boxes[i].innerText = "";
       return i;
     }
     boxes[i].innerText = "";
   }
-
-  // Else, random
-  return available[Math.floor(Math.random() * available.length)];
-}
-
-function checkSimulatedWin(player) {
-  return winPattern.some(([a, b, c]) =>
-    boxes[a].innerText === player &&
-    boxes[b].innerText === player &&
-    boxes[c].innerText === player
-  );
+  const av = getAvailableMoves();
+  return av[Math.floor(Math.random() * av.length)];
 }
 
 function getBestMove(player) {
-  let bestScore = -Infinity;
-  let move;
+  if (moveCount === 1 && currentAIType() === "hard") {
+    // Prefer center
+    if (boxes[4].innerText === "") return 4;
+
+    // Else pick a random empty corner (guaranteed available)
+    const corners = [0, 2, 6, 8];
+    return (
+      corners.find((i) => boxes[i].innerText === "") ?? getAvailableMoves()[0]
+    );
+  }
+  let best = -Infinity,
+    move;
   for (let i of getAvailableMoves()) {
     boxes[i].innerText = player;
     let score = minimax(false);
     boxes[i].innerText = "";
-    if (score > bestScore) {
-      bestScore = score;
+    if (score > best) {
+      best = score;
       move = i;
     }
   }
   return move;
 }
 
-function minimax(isMaximizing) {
-  const winner = checkVirtualWinner();
-  if (winner === "O") return 1;
+function minimax(isMax) {
+  const winner = checkVirtualWin("X") ? "X" : checkVirtualWin("O") ? "O" : null;
   if (winner === "X") return -1;
+  if (winner === "O") return 1;
   if (getAvailableMoves().length === 0) return 0;
 
-  if (isMaximizing) {
+  if (isMax) {
     let best = -Infinity;
     for (let i of getAvailableMoves()) {
       boxes[i].innerText = "O";
@@ -152,66 +164,74 @@ function minimax(isMaximizing) {
   }
 }
 
-function checkVirtualWinner() {
-  for (let [a, b, c] of winPattern) {
-    let val1 = boxes[a].innerText;
-    let val2 = boxes[b].innerText;
-    let val3 = boxes[c].innerText;
-    if (val1 && val1 === val2 && val1 === val3) return val1;
-  }
-  return null;
+function checkVirtualWin(player) {
+  return winPattern.some(
+    ([a, b, c]) =>
+      boxes[a].innerText === player &&
+      boxes[b].innerText === player &&
+      boxes[c].innerText === player
+  );
 }
 
-boxes.forEach((box, idx) => {
+boxes.forEach((box) => {
   box.addEventListener("click", () => {
-    if (isGameOver || box.innerText !== "") return;
+    if (box.innerText || gameOver) return;
+    if (!turnX && isAIEnabled()) return;
 
-    if (turnX) {
-      box.innerText = "X";
-      box.style.color = "#3f72af";
-      box.disabled = true;
-      moveCount++;
-      turnX = false;
-      turnDisplay.innerText = "O's Turn";
-      turnDisplay.style.color = "#d80032";
-      checkWinner();
+    // 🛠️ FIX THIS LOGIC
+    const currentPlayer = turnX ? "X" : "O";
+    const currentColor = turnX ? "#3f72af" : "#d80032";
 
-      if (isAIEnabled() && !isGameOver) makeAIMove();
+    box.innerText = currentPlayer;
+    box.style.color = currentColor;
+    box.disabled = true;
+
+    moveCount++;
+    checkWinner();
+
+    // Toggle turn
+    if (!gameOver) {
+      turnX = !turnX;
+      turnDisplay.innerText = `${turnX ? "X" : "O"}'s Turn`;
+      turnDisplay.style.color = turnX ? "#3f72af" : "#d80032";
+    }
+
+    // If AI and it’s now O’s turn, make AI move
+    if (isAIEnabled() && !turnX && !gameOver) {
+      setTimeout(makeAIMove, 0);
     }
   });
 });
 
 function checkWinner() {
-  for (let pattern of winPattern) {
-    let [a, b, c] = pattern;
-    let val1 = boxes[a].innerText;
-    let val2 = boxes[b].innerText;
-    let val3 = boxes[c].innerText;
-
-    if (val1 && val1 === val2 && val1 === val3) {
-      displayMessage(val1);
+  for (let [a, b, c] of winPattern) {
+    let val = boxes[a].innerText;
+    if (val && val === boxes[b].innerText && val === boxes[c].innerText) {
+      boxes[a].classList.add("winning-box");
+      boxes[b].classList.add("winning-box");
+      boxes[c].classList.add("winning-box");
+      msgBox.innerText = `${val} wins!`;
+      winContainer.classList.remove("hide");
+      boxes.forEach((b) => (b.disabled = true));
+      gameOver = true;
+      score[val]++;
+      updateScoreboard();
       return;
     }
   }
-
   if (moveCount === 9) {
-    displayMessage("draw");
+    msgBox.innerText = `It's a draw!`;
+    winContainer.classList.remove("hide");
+    gameOver = true;
+    score.draw++;
+    updateScoreboard();
   }
 }
 
-function displayMessage(player) {
-  isGameOver = true;
-  if (player === "draw") {
-    message.innerText = `It's a Draw!`;
-  } else {
-    message.innerText = `${player} wins!`;
-  }
-
-  container.classList.remove("hide");
-  resetbtn.classList.add("hide");
-  boxes.forEach((box) => (box.disabled = true));
-}
-
-resetbtn.addEventListener("click", resetBoard);
-newGame.addEventListener("click", resetBoard);
+newGameBtn.addEventListener("click", resetBoard);
+resetBoardBtn.addEventListener("click", resetBoard);
+resetScoresBtn.addEventListener("click", () => {
+  score = { X: 0, O: 0, draw: 0 };
+  updateScoreboard();
+});
 modeSelect.addEventListener("change", resetBoard);
