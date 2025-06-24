@@ -11,20 +11,23 @@
 <body>
     <nav class="navbar">
         <div class="nav-left">
-            <h1>Tic Tac Toe 🎮</h1>
+            <img src="tic-tac-toe.png" alt="logo">
+            <h1>Tic Tac Toe</h1>
         </div>
         <div class="nav-right">
-            <select id="mode">
-                <option value="pvp">Player vs Player</option>
-                <option value="easy">Vs Bot: Easy</option>
-                <option value="medium">Vs Bot: Hard</option>
-                <option value="hard">Vs Bot: Impossible</option>
-            </select>
             <a href="https://github.com/suyashbha/TicTacToe" target="_blank" class="github-link" title="View on GitHub">
                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" />
             </a>
         </div>
     </nav>
+    <div class="mode-select">
+        <select id="mode">
+                <option value="pvp">Player vs Player</option>
+                <option value="easy">Vs Bot: Easy</option>
+                <option value="medium">Vs Bot: Hard</option>
+                <option value="hard">Vs Bot: Impossible</option>
+            </select>
+    </div>
     <div class="win hide">
         <h1 class="msg"></h1>
         <button class="new">New Game</button>
