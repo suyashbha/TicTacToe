@@ -1,5 +1,4 @@
 const boxes = document.querySelectorAll(".btn");
-const resetBoardBtn = document.getElementById("reset-btn");
 const resetScoresBtn = document.getElementById("reset-scores");
 const turnDisplay = document.getElementById("turn-indicator");
 const modeSelect = document.getElementById("mode");
@@ -229,7 +228,6 @@ function checkWinner() {
 }
 
 newGameBtn.addEventListener("click", resetBoard);
-resetBoardBtn.addEventListener("click", resetBoard);
 resetScoresBtn.addEventListener("click", () => {
   score = { X: 0, O: 0, draw: 0 };
   updateScoreboard();
